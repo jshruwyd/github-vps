@@ -1,10 +1,13 @@
-name: Tailscale - Docker
+name: test cpu ram
 
+on: 
+  workflow_dispatch:
+ 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: chuẩn bị phần mềm
+      - name: test cpu ram neofetch
         run: |
           curl -SsL https://playit-cloud.github.io/ppa/key.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/playit.gpg >/dev/null
           echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit.gpg] https://playit-cloud.github.io/ppa/data ./" | sudo tee /etc/apt/sources.list.d/playit-cloud.list
