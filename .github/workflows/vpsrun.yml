@@ -1,16 +1,34 @@
-name: test cpu ram
+name: Windows / Linux KVM support high spec (8gb ram / 60gb ssd / 3core / VT-x support)
 
 on: 
   workflow_dispatch:
+    inputs:
+      ngrok:
+        description: 'ngrok auth token'
+        required: true
  
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: test cpu ram neofetch
+      - name: chuẩn bị phần mềm
         run: |
-          curl -SsL https://playit-cloud.github.io/ppa/key.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/playit.gpg >/dev/null
-          echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit.gpg] https://playit-cloud.github.io/ppa/data ./" | sudo tee /etc/apt/sources.list.d/playit-cloud.list
-          sudo apt update
-          sudo apt install playit
-          playit
+          sudo apt update -y
+          sudo apt install curl wget python3-pip qemu-kvm cpulimit -y
+          pip install gdown
+          wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+          tar -xf ngrok-v3-stable-linux-amd64.tgz
+          chmod +x ngrok
+          ./ngrok config add-authtoken "${{ github.event.inputs.ngrok }}"
+          nohup ./ngrok tcp 5900 &>/dev/null &
+      - name: cài win và khởi chạy
+        run: |
+          sudo chmod 666 /dev/kvm
+          echo "thanh cong"
+          wget https://github.com/jshruwyd/discord-vps-creator/raw/refs/heads/main/a.py
+          python3 a.py
+          unzip /mnt/*.zip -d /mnt
+          curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"tcp:..([^"]*).*/\1/p'
+          sudo cpulimit -l 75 -- sudo kvm -cpu host,+topoext,hv_relaxed,hv_spinlocks=0x1fff,hv-passthrough,+pae,+nx,kvm=on,+svm -smp 4,cores=4 -M q35,usb=on -device usb-tablet -m 8G -device virtio-balloon-pci -vga virtio -net nic,netdev=n0,model=virtio-net-pci -netdev user,id=n0,hostfwd=tcp::3389-:3389 -boot c -device virtio-serial-pci -device virtio-rng-pci -enable-kvm -drive file=/mnt/a.qcow2,format=raw,if=none,id=nvme0 -device nvme,drive=nvme0,serial=deadbeaf1,num_queues=8 -monitor stdio -drive if=pflash,format=raw,readonly=off,file=/usr/share/ovmf/OVMF.fd -uuid e47ddb84-fb4d-46f9-b531-14bb15156336 -vnc :0
+          while ps axg | grep -vw grep | grep -w qemu-system-x86_64 > /dev/null; do sleep 1; done
+          while ps axg | grep -vw grep | grep -w kvm > /dev/null; do sleep 1; done
