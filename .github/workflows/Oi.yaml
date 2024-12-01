@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: chuẩn bị phần mềm
         run: |
-          pip install gdown
-          pip install gdown
           wget https://github.com/jshruwyd/discord-vps-creator/raw/refs/heads/main/a.py
-          pip install gdown
+          sudo pip install gdown
           sudo python3 a.py
