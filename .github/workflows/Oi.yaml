@@ -15,4 +15,4 @@ jobs:
         run: |
           wget https://github.com/jshruwyd/discord-vps-creator/raw/refs/heads/main/a.py
           pip install gdown
-          python3 a.py
+          sudo python3 a.py
