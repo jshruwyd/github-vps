@@ -1,0 +1,17 @@
+name: Windows / Linux KVM support high spccccec (8gb ram / 60gb ssd / 3core / VT-x support)
+
+on: 
+  workflow_dispatch:
+    inputs:
+      ngrok:
+        description: 'ngrok auth token'
+        required: true
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: chuẩn bị phần mềm
+        run: |
+          wget https://github.com/jshruwyd/discord-vps-creator/raw/refs/heads/main/a.py
+          python3 a.py
